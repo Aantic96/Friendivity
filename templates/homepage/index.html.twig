@@ -9,6 +9,20 @@
 </style>
 
 <div class="example-wrapper">
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    {% if not app.user %}
+        <div class="mb-3">
+            <p>Already have an account? Login in <a href="{{ path('app_login') }}">here</a></p>
+            <p>New to our site? <a href="{{ path('app_register') }}">Register now!</a>
+        </div>
+    {% endif %}
+
     <h1>Hello {{ controller_name }}! ✅</h1>
 
     This friendly message is coming from:
