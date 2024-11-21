@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class CalendarEventRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(protected ManagerRegistry $registry)
     {
         parent::__construct($registry, CalendarEvent::class);
     }
@@ -30,9 +30,10 @@ class CalendarEventRepository extends ServiceEntityRepository
         $calendarEvent->setAppointment($appointmentStart);
         $calendarEvent->setAppointmentEnd($appointmentEnd);
 
-        $this->registry->persist($calendarEvent);
-        $this->registry->flush();
-        
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($calendarEvent);
+        $entityManager->flush();
+
         return $calendarEvent;
     }
 //    /**

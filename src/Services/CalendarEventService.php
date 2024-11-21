@@ -2,30 +2,20 @@
 
 namespace App\Services;
 
+use DateTime;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class CalendarEventService
 {
-
-    public function validateAppointment(UserInterface $user, string $startTime, string $endTime): array
+    /**
+     * Checks that event doesn't end before it even begins
+     */
+    public function appointmentTimeChecker(DateTime $startTime, DateTime $endTime): bool
     {
-        if(!$user) {
-            return [];
-        }
-
-        $timeCheck = $this->appointmentTimeChecker($startTime, $endTime);
-        if(!$timeCheck) {
+        if($endTime < $startTime || $endTime == $startTime){    
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Checks that event doesn't end before it even begins
-     */
-    protected function appointmentTimeChecker($startTime, $endTime): bool
-    {
-
     }
 }

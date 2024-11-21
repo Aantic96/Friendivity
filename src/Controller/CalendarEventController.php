@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\CalendarEventRepository;
 use App\Request\CalendarEventRequest;
 use App\Services\CalendarEventService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,8 +36,14 @@ class CalendarEventController extends AbstractController
         CalendarEventRepository $repository): Response
     {
 
+        $start = new \DateTime($request->appointmentStart);
         $end = new \DateTime($request->appointmentEnd);
-        $start = new \DateTime($request->appointmentEnd);
+
+
+        $correctDate = $service->appointmentTimeChecker($start, $end);
+        if(!$correctDate) {
+            throw new Exception('Appointment end cannot be equal or earlier to appointment start');
+        }
 
         $user = $this->security->getUser();
         
