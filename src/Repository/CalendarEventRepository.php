@@ -5,7 +5,9 @@ namespace App\Repository;
 use App\Entity\CalendarEvent;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -13,11 +15,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class CalendarEventRepository extends ServiceEntityRepository
 {
-    public function __construct(protected ManagerRegistry $registry)
+    public function __construct(protected ManagerRegistry $registry, protected EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, CalendarEvent::class);
     }
-
 
     public function createCalendarEvent(
         UserInterface $user, 
@@ -36,6 +37,45 @@ class CalendarEventRepository extends ServiceEntityRepository
 
         return $calendarEvent;
     }
+
+    public function editCalendarEvent(
+        UserInterface $user,
+        int $calendarId, 
+        DateTime $appointmentStart, 
+        DateTime $appointmentEnd
+        ): CalendarEvent|null
+    {
+        $calendarEvent = $this->entityManager->getRepository(CalendarEvent::class)->find($calendarId);
+
+        if (!$calendarEvent) {
+            throw $this->createNotFoundException(
+                'No calendarEvent found for id '.$calendarId
+            );
+        }
+
+        if($calendarEvent->getOwner()?->getId() !== $user->getId()) {
+            throw new Exception('Only owner can edit CalendarEvent');
+        }
+
+        $calendarEvent->setAppointment($appointmentStart);
+        $calendarEvent->setAppointmentEnd($appointmentEnd);
+
+        $this->entityManager->flush();
+
+        return $calendarEvent;
+    }
+
+    // protected function getCalendarEventById(int $calendarId)
+    // {
+    //     return $this->createQueryBuilder('c')
+    //        ->andWhere('c.exampleField = :val')
+    //        ->setParameter('val', $value)
+    //        ->orderBy('c.id', 'ASC')
+    //        ->setMaxResults(10)
+    //        ->getQuery()
+    //        ->getResult();
+    // }
+
 //    /**
 //     * @return CalendarEvent[] Returns an array of CalendarEvent objects
 //     */
