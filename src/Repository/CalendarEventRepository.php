@@ -89,16 +89,28 @@ class CalendarEventRepository extends ServiceEntityRepository
         return;
     }
 
-    // protected function getCalendarEventById(int $calendarId)
-    // {
-    //     return $this->createQueryBuilder('c')
-    //        ->andWhere('c.exampleField = :val')
-    //        ->setParameter('val', $value)
-    //        ->orderBy('c.id', 'ASC')
-    //        ->setMaxResults(10)
-    //        ->getQuery()
-    //        ->getResult();
-    // }
+    public function getCalendarEvent(
+        UserInterface $user,
+        int $calendarId, 
+    ): CalendarEvent
+    {
+        $calendarEvent = $this->entityManager->getRepository(CalendarEvent::class)->find($calendarId);
+
+        if (!$calendarEvent) {
+            throw new NotFoundHttpException(
+                'No calendarEvent found for id '.$calendarId
+            );
+        }
+
+        //TODO: Add logic that attendees can also see the event
+        if($calendarEvent->getOwner()?->getId() !== $user->getId()) {
+            throw new Exception('Only owner can get CalendarEvent');
+        }
+
+        return $calendarEvent;
+    }
+
+   
 
 //    /**
 //     * @return CalendarEvent[] Returns an array of CalendarEvent objects

@@ -29,6 +29,22 @@ class CalendarEventController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_calendar_event_get_one', methods: ['GET'])]
+    public function get(
+        CalendarEventRepository $repository,
+        int $id
+    ): Response
+    {        
+        $user = $this->security->getUser();
+
+        $event = $repository->getCalendarEvent($user, $id);
+
+        return $this->render('calendar_event/index.html.twig', [
+            'controller_name' => 'CalendarEventController',
+            'calendar_event' => $event
+        ]);
+    }
+
     #[Route('/create', name: 'app_calendar_event_create', methods: ['POST'])]
     public function createCalendarEvent(
         #[MapRequestPayload] CalendarEventRequest $request,        
@@ -47,11 +63,12 @@ class CalendarEventController extends AbstractController
 
         $user = $this->security->getUser();
         
-        $repository->createCalendarEvent($user, $start, $end);
+        $event = $repository->createCalendarEvent($user, $start, $end);
 
 
         return $this->render('calendar_event/index.html.twig', [
             'controller_name' => 'CalendarEventController',
+            'calendar_event' => $event
         ]);
     }
 
@@ -73,16 +90,16 @@ class CalendarEventController extends AbstractController
 
         $user = $this->security->getUser();
 
-        $repository->editCalendarEvent($user, $id, $start, $end);
+        $event = $repository->editCalendarEvent($user, $id, $start, $end);
         
         return $this->render('calendar_event/index.html.twig', [
             'controller_name' => 'CalendarEventController',
+            'calendar_event' => $event
         ]);
     }
 
     #[Route('/delete/{id}', name: 'app_calendar_event_delete', methods: ['DELETE'])]
     public function deleteCalendarEvent(
-        Request $request,
         CalendarEventRepository $repository,
         int $id
     ): Response

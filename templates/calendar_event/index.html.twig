@@ -10,11 +10,11 @@
 
 <div class="example-wrapper">
     <h1>Hello {{ controller_name }}! ✅</h1>
+    
+    {% if calendar_event is defined %}
+        <p>Event start: {{ calendar_event.appointment|date('Y-m-d H:i') }}</p>    
+        <p>Event end: {{ calendar_event.appointmentEnd|date('Y-m-d H:i') }}</p>    
+    {% endif %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/Friendivity/src/Controller/CalendarEventController.php</code></li>
-        <li>Your template at <code>/var/www/Friendivity/templates/calendar_event/index.html.twig</code></li>
-    </ul>
 </div>
 {% endblock %}
