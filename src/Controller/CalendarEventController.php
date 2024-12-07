@@ -2,14 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\CalendarEvent;
 use App\Repository\CalendarEventRepository;
 use App\Request\CalendarEventRequest;
 use App\Services\CalendarEventService;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -61,8 +60,8 @@ class CalendarEventController extends AbstractController
         #[MapRequestPayload] CalendarEventRequest $request,        
         CalendarEventService $service,
         CalendarEventRepository $repository,
-        EntityManagerInterface $entityManager,
-        int $id): Response
+        int $id
+        ): Response
     {
         $start = new \DateTime($request->appointmentStart);
         $end = new \DateTime($request->appointmentEnd);
@@ -81,9 +80,16 @@ class CalendarEventController extends AbstractController
         ]);
     }
 
-    #[Route('/delete', name: 'app_calendar_event_delete', methods: ['DELETE'])]
-    public function deleteCalendarEvent(): Response
+    #[Route('/delete/{id}', name: 'app_calendar_event_delete', methods: ['DELETE'])]
+    public function deleteCalendarEvent(
+        Request $request,
+        CalendarEventRepository $repository,
+        int $id
+    ): Response
     {
+        $user = $this->security->getUser();
+        $repository->deleteCalendarEvent($user, $id);
+
         return $this->render('calendar_event/index.html.twig', [
             'controller_name' => 'CalendarEventController',
         ]);

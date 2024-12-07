@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -48,7 +49,7 @@ class CalendarEventRepository extends ServiceEntityRepository
         $calendarEvent = $this->entityManager->getRepository(CalendarEvent::class)->find($calendarId);
 
         if (!$calendarEvent) {
-            throw $this->createNotFoundException(
+            throw new NotFoundHttpException(
                 'No calendarEvent found for id '.$calendarId
             );
         }
@@ -63,6 +64,29 @@ class CalendarEventRepository extends ServiceEntityRepository
         $this->entityManager->flush();
 
         return $calendarEvent;
+    }
+
+    public function deleteCalendarEvent(
+        UserInterface $user,
+        int $calendarId, 
+    ): void
+    {
+        $calendarEvent = $this->entityManager->getRepository(CalendarEvent::class)->find($calendarId);
+
+        if (!$calendarEvent) {
+            throw new NotFoundHttpException(
+                'No calendarEvent found for id '.$calendarId
+            );
+        }
+
+        if($calendarEvent->getOwner()?->getId() !== $user->getId()) {
+            throw new Exception('Only owner can delete CalendarEvent');
+        }
+
+        $this->entityManager->remove($calendarEvent);
+        $this->entityManager->flush();
+
+        return;
     }
 
     // protected function getCalendarEventById(int $calendarId)
