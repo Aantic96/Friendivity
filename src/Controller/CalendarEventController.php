@@ -54,6 +54,8 @@ class CalendarEventController extends AbstractController
 
         $start = new \DateTime($request->appointmentStart);
         $end = new \DateTime($request->appointmentEnd);
+        $title = $request->appointmentTitle;
+        $description = $request->appointmentDescription ?? null;
 
 
         $correctDate = $service->appointmentTimeChecker($start, $end);
@@ -63,7 +65,7 @@ class CalendarEventController extends AbstractController
 
         $user = $this->security->getUser();
         
-        $event = $repository->createCalendarEvent($user, $start, $end);
+        $event = $repository->createCalendarEvent($user, $start, $end, $title, $description);
 
 
         return $this->render('calendar_event/index.html.twig', [
@@ -82,6 +84,8 @@ class CalendarEventController extends AbstractController
     {
         $start = new \DateTime($request->appointmentStart);
         $end = new \DateTime($request->appointmentEnd);
+        $title = $request->appointmentTitle;
+        $description = $request->appointmentDescription ?? null;
 
         $correctDate = $service->appointmentTimeChecker($start, $end);
         if(!$correctDate) {
@@ -90,7 +94,7 @@ class CalendarEventController extends AbstractController
 
         $user = $this->security->getUser();
 
-        $event = $repository->editCalendarEvent($user, $id, $start, $end);
+        $event = $repository->editCalendarEvent($user, $id, $start, $end, $title, $description);
         
         return $this->render('calendar_event/index.html.twig', [
             'controller_name' => 'CalendarEventController',

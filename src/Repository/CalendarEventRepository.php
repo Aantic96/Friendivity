@@ -24,14 +24,18 @@ class CalendarEventRepository extends ServiceEntityRepository
     public function createCalendarEvent(
         UserInterface $user, 
         DateTime $appointmentStart, 
-        DateTime $appointmentEnd
+        DateTime $appointmentEnd,
+        string $appointmentTitle,
+        ?string $description = ""
         ): CalendarEvent|null
     {
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setOwner($user);
         $calendarEvent->setAppointment($appointmentStart);
         $calendarEvent->setAppointmentEnd($appointmentEnd);
-
+        $calendarEvent->setTitle($appointmentTitle);
+        $calendarEvent->setDescription($description);
+        
         $entityManager = $this->getEntityManager();
         $entityManager->persist($calendarEvent);
         $entityManager->flush();
@@ -43,7 +47,9 @@ class CalendarEventRepository extends ServiceEntityRepository
         UserInterface $user,
         int $calendarId, 
         DateTime $appointmentStart, 
-        DateTime $appointmentEnd
+        DateTime $appointmentEnd,
+        string $appointmentTitle,
+        ?string $description = ""
         ): CalendarEvent|null
     {
         $calendarEvent = $this->entityManager->getRepository(CalendarEvent::class)->find($calendarId);
@@ -60,6 +66,8 @@ class CalendarEventRepository extends ServiceEntityRepository
 
         $calendarEvent->setAppointment($appointmentStart);
         $calendarEvent->setAppointmentEnd($appointmentEnd);
+        $calendarEvent->setTitle($appointmentTitle);
+        $calendarEvent->setDescription($description);
 
         $this->entityManager->flush();
 

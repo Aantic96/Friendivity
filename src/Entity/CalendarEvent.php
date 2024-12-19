@@ -24,6 +24,12 @@ class CalendarEvent
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $AppointmentEnd = null;
 
+    #[ORM\Column(length: 60)]
+    private ?string $title = null;
+
+    #[ORM\Column(length: 155, nullable: true)]
+    private ?string $description = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +67,30 @@ class CalendarEvent
     public function setAppointmentEnd(\DateTimeInterface $AppointmentEnd): static
     {
         $this->AppointmentEnd = $AppointmentEnd;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

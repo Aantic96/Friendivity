@@ -12,6 +12,12 @@
     <h1>Hello {{ controller_name }}! ✅</h1>
     
     {% if calendar_event is defined %}
+        <p>{{ calendar_event.title }}</p>
+
+        {% if calendar_event.description %}
+            <p>Description: {{calendar_event.description}}</p>
+        {% endif %}
+        
         <p>Event start: {{ calendar_event.appointment|date('Y-m-d H:i') }}</p>    
         <p>Event end: {{ calendar_event.appointmentEnd|date('Y-m-d H:i') }}</p>    
     {% endif %}
