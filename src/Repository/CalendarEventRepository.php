@@ -118,6 +118,26 @@ class CalendarEventRepository extends ServiceEntityRepository
         return $calendarEvent;
     }
 
+    public function getOwnedCalendarEvents(
+        UserInterface $user,
+        bool $upcomingOnly
+    ): array
+    {
+        $qb = $this->entityManager->createQueryBuilder()
+        ->select('ce')
+        ->from(CalendarEvent::class, 'ce') 
+        ->where('ce.owner = :owner')
+        ->setParameter(
+            'owner', $user
+        );
+
+        if($upcomingOnly) {
+            $qb->andWhere('ce.appointment >= :now')
+               ->setParameter('now', new \DateTime());
+        }
+
+        return $qb->getQuery()->getResult(); 
+    }
    
 
 //    /**

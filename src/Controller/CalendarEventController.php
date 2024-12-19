@@ -29,6 +29,23 @@ class CalendarEventController extends AbstractController
         ]);
     }
 
+    #[Route('/owned', name: 'app_calendar_event_get_all_owned', methods: ['GET'])]
+    public function getAllOwned(
+        CalendarEventRepository $repository,
+        Request                 $request
+    ): Response
+    {        
+        $user = $this->security->getUser();
+
+        $upcomingOnly = $request->query->getBoolean('upcomingOnly', false);
+        $events = $repository->getOwnedCalendarEvents($user, $upcomingOnly);
+
+        return $this->render('calendar_event/index_owned.html.twig', [
+            'controller_name' => 'CalendarEventController',
+            'calendar_events' =>  $events
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_calendar_event_get_one', methods: ['GET'])]
     public function get(
         CalendarEventRepository $repository,
@@ -51,7 +68,6 @@ class CalendarEventController extends AbstractController
         CalendarEventService $service,
         CalendarEventRepository $repository): Response
     {
-
         $start = new \DateTime($request->appointmentStart);
         $end = new \DateTime($request->appointmentEnd);
         $title = $request->appointmentTitle;
@@ -66,7 +82,6 @@ class CalendarEventController extends AbstractController
         $user = $this->security->getUser();
         
         $event = $repository->createCalendarEvent($user, $start, $end, $title, $description);
-
 
         return $this->render('calendar_event/index.html.twig', [
             'controller_name' => 'CalendarEventController',

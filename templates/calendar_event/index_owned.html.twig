@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CalendarEventController!{% endblock %}
+
+{% block body %}
+    <h1>Your Calendar Events</h1>
+
+    {% if calendar_events is empty %}
+        <p>No events found.</p>
+    {% else %}
+        <ul>
+            {% for calendar_event in calendar_events %}
+                <li>
+                    <strong>{{ calendar_event.title }}</strong><br>
+                    Date: {{ calendar_event.appointment|date('d-m-Y H:i') }}<br>
+                    Description: {{ calendar_event.description }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
