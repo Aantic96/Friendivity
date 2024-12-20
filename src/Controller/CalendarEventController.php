@@ -14,13 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 
 #[Route('/calendar/event')]
-class CalendarEventController extends AbstractController
+class CalendarEventController extends BaseController
 {
-    public function __construct(private Security $security)
-    {
-        
-    }
-
     #[Route('/', name: 'app_calendar_event_get_all', methods: ['GET'])]
     public function index(): Response
     {        
