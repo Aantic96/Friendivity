@@ -60,10 +60,29 @@ class FriendRequestRepository extends ServiceEntityRepository
         return $recipient;
     }
 
-    public function deletePreviouslyCancelledFriendRequest(FriendRequest $oldRequest)
+    public function deletePreviouslyCancelledFriendRequest(FriendRequest $oldRequest): void
     {
         $this->entityManager->remove($oldRequest);
         $this->entityManager->flush();
+    }
+
+    public function getAllRecievedFriendRequests(UserInterface $user, FriendRequestStatus $status): array
+    {
+        return $this->entityManager->createQueryBuilder()
+        ->select('fr')
+        ->from(FriendRequest::class, 'fr')
+        ->where(
+            'fr.recipient = :user AND fr.status = :status'
+        )
+        ->setParameter('user', $user)
+        ->setParameter('status', $status)
+        ->getQuery()
+        ->getResult();
+    }
+
+    public function getAllSentFriendRequests(UserInterface $user)
+    {
+        
     }
 
 //    /**

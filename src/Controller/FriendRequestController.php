@@ -31,6 +31,10 @@ class FriendRequestController extends BaseController
     ): Response
     {
         $user = $this->security->getUser();
+        
+        if(!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
         $friendId = $request->get('friendId');
 
@@ -43,7 +47,7 @@ class FriendRequestController extends BaseController
         
         if(!$result) {
             //TODO: Add logic for notifying the recipient
-            $friendRequest = $repository->createFriendRequest($user, $friendId);
+            $friendRequest = $repository->createFriendRequest($user, $recipient);
             
             return $this->render('friend_request/index.html.twig', [
                 'controller_name' => 'FriendRequestController',
@@ -55,7 +59,7 @@ class FriendRequestController extends BaseController
         {
             //TODO: Add logic for notifying the recipient
             $repository->deletePreviouslyCancelledFriendRequest($result);
-            $friendRequest = $repository->createFriendRequest($user, $friendId);
+            $friendRequest = $repository->createFriendRequest($user, $recipient);
 
             return $this->render('friend_request/index.html.twig', [
                 'controller_name' => 'FriendRequestController',
@@ -67,5 +71,36 @@ class FriendRequestController extends BaseController
             'status' => $status
         ]);
        
+    }
+
+    #[Route('/sent/pending', name: 'app_friend_request_get_all_sent_pending')]
+    public function getSentPending(
+        Request                 $request,
+        FriendRequestRepository $repository
+        )
+    {
+        $user = $this->security->getUser();
+        
+        if(!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+    }
+
+    #[Route('/recieved/pending', name: 'app_friend_request_get_all_recieved_pending')]
+    public function getRecievedPending(
+        Request                 $request,
+        FriendRequestRepository $repository
+        )
+    {
+        $user = $this->security->getUser();
+        
+        if(!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $recievedFriendRequests = $repository->getAllRecievedFriendRequests($user, FriendRequestStatus::PENDING);
+        dd($recievedFriendRequests);
+
     }
 }
