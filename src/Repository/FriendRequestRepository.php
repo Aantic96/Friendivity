@@ -6,6 +6,7 @@ use App\Entity\FriendRequest;
 use App\Entity\User;
 use App\Enum\FriendRequestStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
@@ -66,7 +67,7 @@ class FriendRequestRepository extends ServiceEntityRepository
         $this->entityManager->flush();
     }
 
-    public function getAllRecievedFriendRequests(UserInterface $user, FriendRequestStatus $status): array
+    public function getAllRecievedFriendRequests(UserInterface $user, FriendRequestStatus $status)
     {
         return $this->entityManager->createQueryBuilder()
         ->select('fr')
@@ -76,13 +77,20 @@ class FriendRequestRepository extends ServiceEntityRepository
         )
         ->setParameter('user', $user)
         ->setParameter('status', $status)
-        ->getQuery()
-        ->getResult();
+        ->getQuery();
     }
 
-    public function getAllSentFriendRequests(UserInterface $user)
+    public function getAllSentFriendRequests(UserInterface $user, FriendRequestStatus $status)
     {
-        
+        return $this->entityManager->createQueryBuilder()
+        ->select('fr')
+        ->from(FriendRequest::class, 'fr')
+        ->where(
+            'fr.sender = :user AND fr.status = :status'
+        )
+        ->setParameter('user', $user)
+        ->setParameter('status', $status)
+        ->getQuery();
     }
 
 //    /**

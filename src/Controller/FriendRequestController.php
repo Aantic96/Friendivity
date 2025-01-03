@@ -7,6 +7,7 @@ use App\Enum\FriendRequestStatus;
 use App\Repository\FriendRequestRepository;
 use App\Services\FriendRequestService;
 use Exception;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,6 +77,7 @@ class FriendRequestController extends BaseController
     #[Route('/sent/pending', name: 'app_friend_request_get_all_sent_pending')]
     public function getSentPending(
         Request                 $request,
+        PaginatorInterface      $paginator,
         FriendRequestRepository $repository
         )
     {
@@ -85,11 +87,24 @@ class FriendRequestController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
+        $sentFriendRequests = $repository->getAllSentFriendRequests($user, FriendRequestStatus::PENDING);
+        
+        $pagination = $paginator->paginate(
+            $sentFriendRequests,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('perPage', 10)
+        );
+
+        return $this->render('friend_request/sent_pending_list.html.twig', [
+            'pagination' => $pagination,
+        ]);
+
     }
 
     #[Route('/recieved/pending', name: 'app_friend_request_get_all_recieved_pending')]
     public function getRecievedPending(
         Request                 $request,
+        PaginatorInterface      $paginator,
         FriendRequestRepository $repository
         )
     {
@@ -100,7 +115,15 @@ class FriendRequestController extends BaseController
         }
 
         $recievedFriendRequests = $repository->getAllRecievedFriendRequests($user, FriendRequestStatus::PENDING);
-        dd($recievedFriendRequests);
+        
+        $pagination = $paginator->paginate(
+            $recievedFriendRequests,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('perPage', 10)
+        );
 
+        return $this->render('friend_request/recieved_pending_list.html.twig', [
+            'pagination' => $pagination,
+        ]);
     }
 }
