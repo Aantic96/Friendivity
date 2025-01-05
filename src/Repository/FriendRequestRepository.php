@@ -11,13 +11,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\Event\FriendRequestAcceptedEvent;
 
 /**
  * @extends ServiceEntityRepository<FriendRequest>
  */
 class FriendRequestRepository extends ServiceEntityRepository
 {
-    public function __construct(protected ManagerRegistry $registry, protected EntityManagerInterface $entityManager)
+    public function __construct(
+        protected ManagerRegistry $registry, 
+        protected EntityManagerInterface $entityManager,
+        protected EventDispatcherInterface $eventDispatcher
+        )
     {
         parent::__construct($registry, FriendRequest::class);
     }
@@ -46,6 +52,20 @@ class FriendRequestRepository extends ServiceEntityRepository
             )
             ->setParameter('user1', $user)
             ->setParameter('user2', $recipient)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function getFriendRequestByRecipientAndId(UserInterface $user, int $id): FriendRequest|null
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('fr')
+            ->from(FriendRequest::class, 'fr')
+            ->where(
+                'fr.recipient = :user AND fr.id = :id'
+            )
+            ->setParameter('user', $user)
+            ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -91,6 +111,20 @@ class FriendRequestRepository extends ServiceEntityRepository
         ->setParameter('user', $user)
         ->setParameter('status', $status)
         ->getQuery();
+    }
+
+    public function acceptFriendRequest(FriendRequest $friendRequest): FriendRequest
+    {
+        $friendRequest->setStatus(FriendRequestStatus::ACCEPTED);
+
+        $event = new FriendRequestAcceptedEvent($friendRequest);
+        $this->eventDispatcher->dispatch($event);
+
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($friendRequest);
+        $entityManager->flush();
+
+        return $friendRequest;
     }
 
 //    /**

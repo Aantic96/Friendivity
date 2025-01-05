@@ -12,7 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class FriendRequestService
 {
-    public function __construct(protected EntityManagerInterface $entityManager, protected FriendRequestRepository $repository)
+    public function __construct(
+        protected EntityManagerInterface $entityManager, 
+        protected FriendRequestRepository $repository
+        )
     {
     }
 
@@ -29,5 +32,20 @@ class FriendRequestService
         }
 
         return $result;
+    }
+
+    public function acceptFriendRequest(UserInterface $user, int $id): ?FriendRequest
+    {
+        $friendRequest = $this->repository->getFriendRequestByRecipientAndId($user, $id);
+
+        if(!$friendRequest) {
+            throw new Exception('No FriendRequest under that id for the given user found');
+        }
+
+        if($friendRequest->getStatus() == FriendRequestStatus::ACCEPTED) {
+            throw new Exception('You are already friends with this user');
+        }
+
+        return $this->repository->acceptFriendRequest($friendRequest);
     }
 }

@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Friend;
+use App\Entity\FriendRequest;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,9 +14,31 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FriendRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(protected ManagerRegistry $registry, protected EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Friend::class);
+    }
+
+    public function createFriendshipForUsers(FriendRequest $friendRequest): void
+    {
+        $sender = $friendRequest->getSender();
+        $recipient = $friendRequest->getRecipient();
+
+        $firstFriend = new Friend();
+        $firstFriend->setUser($sender);
+        $firstFriend->setFriend($recipient);
+        $firstFriend->setFriendsSince(new DateTime());
+        $firstFriend->setFavorite(false);
+
+        $secondFriend = new Friend();
+        $secondFriend->setUser($recipient);
+        $secondFriend->setFriend($sender);
+        $secondFriend->setFriendsSince(new DateTime());
+        $secondFriend->setFavorite(false);
+        
+        $this->entityManager->persist($firstFriend);
+        $this->entityManager->persist($secondFriend);
+        $this->entityManager->flush();
     }
 
     //    /**

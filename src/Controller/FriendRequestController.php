@@ -8,7 +8,6 @@ use App\Repository\FriendRequestRepository;
 use App\Services\FriendRequestService;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -124,6 +123,26 @@ class FriendRequestController extends BaseController
 
         return $this->render('friend_request/recieved_pending_list.html.twig', [
             'pagination' => $pagination,
+        ]);
+    }
+
+    #[Route('/accept/{id}', name: 'app_friend_request_accept')]
+    public function accept(
+        Request                 $request,
+        FriendRequestService    $service,
+        int                     $id
+    ): Response
+    {
+        $user = $this->security->getUser();
+        
+        if(!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $friendRequest = $service->acceptFriendRequest($user, $id);
+
+        return $this->render('friend_request/index.html.twig', [
+            'controller_name' => 'FriendRequestController',
         ]);
     }
 }
