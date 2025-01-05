@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
- #[Route('/friend/request')]
+#[Route('/friend/request')]
 class FriendRequestController extends BaseController
 {
     #[Route('/', name: 'app_friend_request')]
@@ -128,7 +128,6 @@ class FriendRequestController extends BaseController
 
     #[Route('/accept/{id}', name: 'app_friend_request_accept')]
     public function accept(
-        Request                 $request,
         FriendRequestService    $service,
         int                     $id
     ): Response
@@ -145,4 +144,6 @@ class FriendRequestController extends BaseController
             'controller_name' => 'FriendRequestController',
         ]);
     }
+
+    //TODO: add route for cancel and decline
 }
