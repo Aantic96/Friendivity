@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/friend')]
 class FriendController extends BaseController
 {
-    #[Route('/', name: 'app_friends')]
+    #[Route('/', name: 'app_friends', methods:'GET')]
     public function index(
         Request            $request,
         PaginatorInterface $paginator,
@@ -38,7 +38,7 @@ class FriendController extends BaseController
         ]);
     }
 
-    #[Route('/{id}/favorites', name: 'app_friends_add_to_favorites')]
+    #[Route('/{id}/favorites', name: 'app_friends_add_to_favorites', methods: ['PUT', 'PATCH'])]
     public function addToFavorites(
         FriendRepository   $repository,
         int                $id

@@ -23,7 +23,7 @@ class FriendRequestController extends BaseController
         ]);
     }
 
-    #[Route('/create', name: 'app_friend_request_create')]
+    #[Route('/create', name: 'app_friend_request_create', methods: 'POST')]
     public function create(
         Request                 $request,
         FriendRequestRepository $repository,
@@ -73,7 +73,7 @@ class FriendRequestController extends BaseController
        
     }
 
-    #[Route('/sent/pending', name: 'app_friend_request_get_all_sent_pending')]
+    #[Route('/sent/pending', name: 'app_friend_request_get_all_sent_pending', methods: 'GET')]
     public function getSentPending(
         Request                 $request,
         PaginatorInterface      $paginator,
@@ -100,7 +100,7 @@ class FriendRequestController extends BaseController
 
     }
 
-    #[Route('/recieved/pending', name: 'app_friend_request_get_all_recieved_pending')]
+    #[Route('/recieved/pending', name: 'app_friend_request_get_all_recieved_pending', methods: 'GET')]
     public function getRecievedPending(
         Request                 $request,
         PaginatorInterface      $paginator,
@@ -126,7 +126,7 @@ class FriendRequestController extends BaseController
         ]);
     }
 
-    #[Route('/accept/{id}', name: 'app_friend_request_accept')]
+    #[Route('/accept/{id}', name: 'app_friend_request_accept', methods: ['PUT', 'PATCH'])]
     public function accept(
         FriendRequestService    $service,
         int                     $id
